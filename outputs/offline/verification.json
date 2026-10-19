@@ -1,0 +1,45 @@
+{
+  "created_utc": "2026-10-19T22:59:35.790080+00:00",
+  "protected_files_unchanged": {
+    "SUBMISSION.md": true,
+    "RUBRIC.md": true,
+    "data/corpus.jsonl": true,
+    "data/questions.json": true
+  },
+  "submission_sha256": "8055e85b84febf580a50a965987228690aecb5df1507e369f970a2dd914b4ec8",
+  "submission_hash_matches_baseline": true,
+  "part_a_precedes_first_python_commit": true,
+  "first_python_commit": "57ad2251b23c916157cdcf324db256175e9532ba",
+  "paired_runs_controlled_fields_equal": true,
+  "ablation_only_changes_lookup_description": true,
+  "source_hash_matches_full_runs": true,
+  "regenerated_summaries_equal": {
+    "smoke_validated": true,
+    "q09": true,
+    "run_1": true,
+    "run_2": true,
+    "ablation": true
+  },
+  "records_per_full_run": {
+    "run_1": 60,
+    "run_2": 60
+  },
+  "actual_model_requests_in_runs_excluding_preflight": 478,
+  "all_tool_ids_answered_once_in_actual_traces": true,
+  "dynamic_execution_calls": [],
+  "credential_matches_in_deliverables": [],
+  "env_ignored": true,
+  "env_git_history_empty": true,
+  "env_tracked": false,
+  "protocol_file_unchanged_since_pre_run_commit": true,
+  "report_has_unfilled_markers": false,
+  "preserved_concurrent_user_changes": [
+    "README.md: cp .env.example .env changed locally to cp .env .env; left unstaged"
+  ],
+  "offline_tests": {
+    "passed": 146,
+    "failed": 0,
+    "skipped": 0,
+    "output": "outputs/offline/pytest.txt"
+  }
+}
