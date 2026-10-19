@@ -1,0 +1,34 @@
+{
+  "smoke": {
+    "cost_usd": "0.00643346",
+    "api_requests": 30
+  },
+  "smoke_validated": {
+    "cost_usd": "0.00543218",
+    "api_requests": 30
+  },
+  "q09": {
+    "cost_usd": "0.00043280",
+    "api_requests": 4
+  },
+  "run_1": {
+    "cost_usd": "0.03606300",
+    "api_requests": 196
+  },
+  "run_2": {
+    "cost_usd": "0.03426750",
+    "api_requests": 198
+  },
+  "ablation": {
+    "cost_usd": "0.00514276",
+    "api_requests": 20
+  },
+  "preflight": {
+    "cost_usd": "0.0004308",
+    "api_requests": 2
+  },
+  "total": {
+    "cost_usd": "0.08820250",
+    "api_requests": 480
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "S3": {
+    "questions": 5,
+    "correct": 4,
+    "unanswered": 0,
+    "median_seconds_per_question": 4.785879800001567,
+    "total_seconds": 32.88652219999494,
+    "model_seconds": 32.83345030002238,
+    "tool_seconds": 0.01060860000870889,
+    "api_requests": 20,
+    "missing_usage_requests": 0,
+    "input_tokens": 44441,
+    "output_tokens": 1029,
+    "measured_input_tokens": 44441,
+    "measured_output_tokens": 1029,
+    "cost_usd": "0.00514276",
+    "measured_cost_usd": "0.00514276",
+    "unknown_cost_requests": 0
+  }
+}

@@ -1,0 +1,283 @@
+[
+  {
+    "question_id": "Q-01",
+    "original": {
+      "tool_calls": 3,
+      "arguments": [
+        {
+          "arguments": "{\"query\": \"Ossbridge population area population density 2025\"}",
+          "name": "lookup"
+        },
+        {
+          "arguments": "{\"query\": \"Ossford population area population density 2025\"}",
+          "name": "lookup"
+        },
+        {
+          "arguments": "{\"mode\":\"evaluate\",\"expression\":\"52904/1284.6-30982/846.2\"}",
+          "name": "calculate"
+        }
+      ],
+      "answer": "Ossbridge has the higher population density by 4.57015387231975 residents per square kilometre.\n\nANSWER: Ossbridge | 4.57015387231975",
+      "correct": true
+    },
+    "vague": {
+      "tool_calls": 3,
+      "arguments": [
+        {
+          "arguments": "{\"query\": \"Ossbridge population 2025 area population density\"}",
+          "name": "lookup"
+        },
+        {
+          "arguments": "{\"query\": \"Ossford population 2025 area population density\"}",
+          "name": "lookup"
+        },
+        {
+          "arguments": "{\"mode\":\"evaluate\",\"expression\":\"52904/1284.6-30982/846.2\"}",
+          "name": "calculate"
+        }
+      ],
+      "answer": "Ossbridge has the higher population density by 4.57015387231975 residents per square kilometre.\n\nANSWER: Ossbridge | 4.57015387231975",
+      "correct": true
+    }
+  },
+  {
+    "question_id": "Q-03",
+    "original": {
+      "tool_calls": 9,
+      "arguments": [
+        {
+          "arguments": "{\"query\": \"Lindenmoor household water use 2025 resident per day litres\"}",
+          "name": "lookup"
+        },
+        {
+          "arguments": "{\"query\": \"Kelmarsh household water use 2025 resident per day litres\"}",
+          "name": "lookup"
+        },
+        {
+          "arguments": "{\"query\": \"Lindenmoor Kelmarsh 2025 population household water use water consumption\"}",
+          "name": "lookup"
+        },
+        {
+          "arguments": "{\"query\": \"Kelmarsh district profile 2025 census population\"}",
+          "name": "lookup"
+        },
+        {
+          "arguments": "{\"query\": \"Lindenmoor district profile 2025 household water population\"}",
+          "name": "lookup"
+        },
+        {
+          "arguments": "{\"query\": \"Kelmarsh district 2025 population 1739 megalitres\"}",
+          "name": "lookup"
+        },
+        {
+          "arguments": "{\"mode\": \"evaluate\", \"expression\": \"2151400000/(29051*365)\"}",
+          "name": "calculate"
+        },
+        {
+          "arguments": "{\"mode\": \"evaluate\", \"expression\": \"1739000000/(24117*365)\"}",
+          "name": "calculate"
+        },
+        {
+          "arguments": "{\"mode\":\"evaluate\",\"expression\":\"2151400000/(29051*365)-1739000000/(24117*365)\"}",
+          "name": "calculate"
+        }
+      ],
+      "answer": "Lindenmoor used more water: 202.89306995774555 litres per resident per day versus Kelmarsh’s 197.55291129260834, a difference of 5.34015866513721 litres per resident per day.\n\nANSWER: Lindenmoor | 5.34015866513721",
+      "correct": true
+    },
+    "vague": {
+      "tool_calls": 10,
+      "arguments": [
+        {
+          "arguments": "{\"query\": \"Lindenmoor household water use 2025 residents daily\"}",
+          "name": "lookup"
+        },
+        {
+          "arguments": "{\"query\": \"Kelmarsh household water use 2025 residents daily\"}",
+          "name": "lookup"
+        },
+        {
+          "arguments": "{\"query\": \"Lindenmoor district profile 2025 population household water use\"}",
+          "name": "lookup"
+        },
+        {
+          "arguments": "{\"query\": \"Kelmarsh district profile 2025 population household water use\"}",
+          "name": "lookup"
+        },
+        {
+          "arguments": "{\"query\":\"Lindenmoor population 2025 census residents household water 2025 megalitres\",\"top_k\":5}",
+          "name": "lookup"
+        },
+        {
+          "arguments": "{\"query\":\"Kelmarsh census population 2025 2025 household water 1,739 megalitres\",\"top_k\":5}",
+          "name": "lookup"
+        },
+        {
+          "arguments": "{\"query\":\"Kelmarsh district profile 2025 census population\",\"top_k\":5}",
+          "name": "lookup"
+        },
+        {
+          "arguments": "{\"mode\": \"evaluate\", \"expression\": \"2151400*1000/(29051*365)\"}",
+          "name": "calculate"
+        },
+        {
+          "arguments": "{\"mode\": \"evaluate\", \"expression\": \"1739*1000*1000/(24117*365)\"}",
+          "name": "calculate"
+        },
+        {
+          "arguments": "{\"mode\":\"evaluate\",\"expression\":\"2151400*1000/(29051*365)-1739*1000*1000/(24117*365)\"}",
+          "name": "calculate"
+        }
+      ],
+      "answer": "Lindenmoor used more water per resident per day, by 5.34015866513721 litres.\n\nANSWER: Lindenmoor | 5.34015866513721",
+      "correct": true
+    }
+  },
+  {
+    "question_id": "Q-08",
+    "original": {
+      "tool_calls": 4,
+      "arguments": [
+        {
+          "arguments": "{\"query\": \"Brightwater household water tariff 2025 households water payments 2025\"}",
+          "name": "lookup"
+        },
+        {
+          "arguments": "{\"query\": \"Millbrook household water tariff 2025 households water payments 2025\"}",
+          "name": "lookup"
+        },
+        {
+          "arguments": "{\"query\": \"Brightwater Millbrook households 2025 water tariff population households\"}",
+          "name": "lookup"
+        },
+        {
+          "arguments": "{\"mode\":\"evaluate\",\"expression\":\"(3315-2806)*1000*142.35/1000000\"}",
+          "name": "calculate"
+        }
+      ],
+      "answer": "Brightwater households paid more, by 72.45615 million tenge.\n\nANSWER: Brightwater | 72.45615",
+      "correct": true
+    },
+    "vague": {
+      "tool_calls": 5,
+      "arguments": [
+        {
+          "arguments": "{\"query\": \"Brightwater households 2025 population household water tariff 2025 water consumption\"}",
+          "name": "lookup"
+        },
+        {
+          "arguments": "{\"query\": \"Millbrook households 2025 population household water tariff 2025 water consumption\"}",
+          "name": "lookup"
+        },
+        {
+          "arguments": "{\"query\": \"Brightwater Millbrook 2025 household water tariff\"}",
+          "name": "lookup"
+        },
+        {
+          "arguments": "{\"query\": \"Brightwater Millbrook households 2025 water use census\"}",
+          "name": "lookup"
+        },
+        {
+          "arguments": "{\"mode\":\"evaluate\",\"expression\":\"(3315-2806)*1000*142.35/1000000\"}",
+          "name": "calculate"
+        }
+      ],
+      "answer": "Brightwater's households paid more, by 72.45615 million tenge.\n\nANSWER: Brightwater | 72.45615",
+      "correct": true
+    }
+  },
+  {
+    "question_id": "Q-09",
+    "original": {
+      "tool_calls": 5,
+      "arguments": [
+        {
+          "arguments": "{\"query\": \"Brightwater population area density 2025\"}",
+          "name": "lookup"
+        },
+        {
+          "arguments": "{\"query\": \"Millbrook population area density 2025\"}",
+          "name": "lookup"
+        },
+        {
+          "arguments": "{\"mode\": \"evaluate\", \"expression\": \"44675/921.4\"}",
+          "name": "calculate"
+        },
+        {
+          "arguments": "{\"mode\": \"evaluate\", \"expression\": \"37203/758.6\"}",
+          "name": "calculate"
+        },
+        {
+          "arguments": "{\"mode\":\"evaluate\",\"expression\":\"37203/758.6-44675/921.4\"}",
+          "name": "calculate"
+        }
+      ],
+      "answer": "Millbrook has the higher population density by 0.5556561156405735 residents per square kilometre.\n\nANSWER: Millbrook | 0.5556561156405735",
+      "correct": true
+    },
+    "vague": {
+      "tool_calls": 3,
+      "arguments": [
+        {
+          "arguments": "{\"query\": \"Brightwater population 2025 area square kilometres population density\"}",
+          "name": "lookup"
+        },
+        {
+          "arguments": "{\"query\": \"Millbrook population 2025 area square kilometres population density\"}",
+          "name": "lookup"
+        },
+        {
+          "arguments": "{\"mode\":\"evaluate\",\"expression\":\"44675/921.4-37203/758.6\"}",
+          "name": "calculate"
+        }
+      ],
+      "answer": "Brightwater has the higher population density by 0.5556561156405735 residents per square kilometre.\n\nANSWER: Brightwater | 0.5556561156405735",
+      "correct": false
+    }
+  },
+  {
+    "question_id": "Q-18",
+    "original": {
+      "tool_calls": 3,
+      "arguments": [
+        {
+          "arguments": "{\"query\": \"Millbrook population 2020 2025 residents\"}",
+          "name": "lookup"
+        },
+        {
+          "arguments": "{\"query\": \"Millbrook population 2025 residents census\"}",
+          "name": "lookup"
+        },
+        {
+          "arguments": "{\"mode\":\"evaluate\",\"expression\":\"37203*(37203/34590)\"}",
+          "name": "calculate"
+        }
+      ],
+      "answer": "Using the 2020 population of 34,590 and 2025 population of 37,203, the same percentage growth would project a 2030 population of 40,013.391413703386. This exceeds 40,000 residents.\n\nANSWER: yes | 40013.391413703386",
+      "correct": true
+    },
+    "vague": {
+      "tool_calls": 4,
+      "arguments": [
+        {
+          "arguments": "{\"query\": \"Millbrook population 2020 2025\"}",
+          "name": "lookup"
+        },
+        {
+          "arguments": "{\"query\": \"Millbrook population 2025\"}",
+          "name": "lookup"
+        },
+        {
+          "arguments": "{\"query\": \"Millbrook population 2030 projection\"}",
+          "name": "lookup"
+        },
+        {
+          "arguments": "{\"mode\":\"evaluate\",\"expression\":\"37203*(37203/34590)\" }",
+          "name": "calculate"
+        }
+      ],
+      "answer": "The 2020–2025 growth rate was approximately 7.5548%. Applying the same percentage growth to the 2025 population gives a projected 2030 population of 40013.391413703386, which exceeds 40,000.\n\nANSWER: yes | 40013.391413703386",
+      "correct": true
+    }
+  }
+]
