@@ -89,6 +89,11 @@ def test_unknown_query(lookup):
     assert lookup(query="zyxqv")["matches"] == []
 
 
+@pytest.mark.parametrize("word", ["resident", "density", "pupil", "school", "budgets"])
+def test_indicator_words_are_not_district_typos(lookup, word):
+    assert lookup(query=f"Lindenmoor {word} 2025")["ok"]
+
+
 def test_generic_corrections_and_context_limit(tmp_path):
     rows = [{"id": "X-1", "title": "Newtown district profile (2025)", "text": "Newtown area is 20 km2. Population is 10."}]
     rows += [{"id": f"C-{i}", "title": "Correction notice - Newtown", "text": f"Correction: Newtown area is {i} km2."}

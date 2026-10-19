@@ -104,11 +104,12 @@ def main(argv: list[str] | None = None) -> int:
         else:
             result = q09_trace(read_json(args.trace))
             write_json(args.output, result)
-        print(json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False))
+        # ASCII-safe console JSON also works in legacy Windows code pages.
+        print(json.dumps(result, ensure_ascii=True, indent=2, allow_nan=False))
         return 2 if isinstance(result, dict) and (result.get("status") == "blocked" or result.get("ok") is False) else 0
     except (OSError, ValueError, KeyError) as exc:
         # These are local validation failures, not raw API exceptions.
-        print(json.dumps({"status": "blocked", "error": str(exc)}, ensure_ascii=False))
+        print(json.dumps({"status": "blocked", "error": str(exc)}, ensure_ascii=True))
         return 2
 
 

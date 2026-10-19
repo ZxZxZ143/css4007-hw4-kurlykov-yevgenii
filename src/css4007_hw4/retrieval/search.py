@@ -13,6 +13,7 @@ class SearchIndex:
         self.metadata = classify(docs)
         self.names = sorted({m.district for m in self.metadata.values() if m.district})
         self.vocabulary = set(re.findall(r"[a-z]+", " ".join(d.text for d in docs).lower()))
+        self.normalized_vocabulary = set(tokens(" ".join(d.text for d in docs)))
         self.passages: list[Excerpt] = []
         self.corrections: dict[str, list[Excerpt]] = {}
         for doc in docs:
@@ -32,7 +33,8 @@ class SearchIndex:
         words = re.findall(r"[a-z]+", query.lower())
         exact = [n for n in self.names if re.search(rf"\b{re.escape(n)}\b", query, re.I)]
         for word in words:
-            if word in self.vocabulary or any(word == n.lower() for n in exact):
+            if (word in self.vocabulary or set(tokens(word)) & self.normalized_vocabulary
+                    or any(word == n.lower() for n in exact)):
                 continue
             similar = sorted(((SequenceMatcher(None, word, n.lower()).ratio(), n) for n in self.names),
                              key=lambda x: (-x[0], x[1]))

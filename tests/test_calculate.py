@@ -37,6 +37,19 @@ def test_syntax():
     assert calculate(mode="evaluate", expression="(1+")["error"]["code"] == "INVALID_EXPRESSION"
 
 
+def test_node_limit_independent_of_depth():
+    expression = "1"
+    for _ in range(6):
+        expression = f"({expression}+{expression})"
+    assert len(expression) < 512
+    assert calculate(mode="evaluate", expression=expression)["error"]["code"] == "LIMIT_EXCEEDED"
+
+
+def test_depth_boundary():
+    assert calculate(mode="evaluate", expression="-" * 14 + "1")["ok"]
+    assert calculate(mode="evaluate", expression="-" * 15 + "1")["error"]["code"] == "LIMIT_EXCEEDED"
+
+
 @pytest.mark.parametrize("args", [{}, {"mode": "wrong"}, {"mode": "evaluate"},
                                   {"mode": "evaluate", "expression": " "}, {"mode": "evaluate", "expression": 5},
                                   {"mode": "evaluate", "expression": "1", "scale": "one"},
