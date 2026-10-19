@@ -17,6 +17,7 @@ def completed(text):
                                        ("ANSWER: yes | NaN", False), ("ANSWER: yes | 1,000", False),
                                        ("ANSWER: yes | 1\nafter", False), ("ANSWER: yes | 1\nANSWER: yes | 2", False),
                                        ("ANSWER: yes | 1e900", False), ("ANSWER: yes | 1e-900", False),
+                                       ("ANSWER: yes | 1e999999999", False),
                                        ("ANSWER:yes|1", False), ("ANSWER: yes | 1 m", False), (None, False)])
 def test_parser(text, valid):
     assert (parse_answer(text) is not None) is valid

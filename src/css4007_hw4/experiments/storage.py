@@ -39,7 +39,8 @@ def source_digest(root: Path) -> str:
 
 def git_value(root: Path, *arguments: str) -> str | None:
     try:
-        result = subprocess.run(["git", *arguments], cwd=root, capture_output=True, text=True, check=True)
+        result = subprocess.run(["git", *arguments], cwd=root, capture_output=True, text=True,
+                                encoding="utf-8", check=True)
         return result.stdout.strip()
     except (OSError, subprocess.SubprocessError):
         return None

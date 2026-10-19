@@ -1,0 +1,132 @@
+{
+  "kind": "tokenizer_estimate",
+  "api_measured": false,
+  "created_utc": "2026-10-19T22:41:11.440516+00:00",
+  "model": "gpt-5.6-luna",
+  "encoding": "o200k_base",
+  "encoding_selection": "model_mapping",
+  "tiktoken_version": "0.14.0",
+  "serialization": "UTF-8 compact JSON, ensure_ascii=False",
+  "tool_definition_tokens": 834,
+  "per_tool_tokens": {
+    "lookup": 303,
+    "calculate": 531
+  },
+  "full_corpus_text_tokens": 2076,
+  "tool_definitions": [
+    {
+      "type": "function",
+      "function": {
+        "name": "lookup",
+        "description": "Search data/corpus.jsonl using BM25 over short original excerpts, without using reference answers. Query by district, indicator and period; regional and multi-district queries are allowed. Exclude archived profiles but retain historical figures in current sources. Return excerpts preserving values, periods and units, with doc_id, title, chunk_id, text, kind (profile/reference/correction) and correction_of (document ID or null). Include and deduplicate related correction excerpts; corrections override only the facts they explicitly change. Limits: top_k primary matches, 10 excerpts overall, 2 complete sentences and 500 text characters per excerpt, and 3000 text characters overall. Return an error if necessary correction context cannot fit. Return selected passages, not whole documents. The model interprets the evidence and requests more if needed; the tool does not calculate or answer the question.",
+        "strict": false,
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 300,
+              "pattern": "\\S",
+              "description": "Non-blank search text. Prefer English corpus terminology, e.g. Brightwater population 2025 area."
+            },
+            "top_k": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 5,
+              "default": 3,
+              "description": "Maximum primary matches. The tool defaults to 3. Additional corrections share the overall limits but do not count toward top_k."
+            }
+          },
+          "required": [
+            "query"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "calculate",
+        "description": "Evaluate arithmetic or convert one numeric quantity. evaluate requires only mode and expression; convert requires mode, value, from_unit and to_unit, with optional scale. Reject fields belonging to the other mode. Arithmetic permits real numeric literals (including scientific notation), parentheses, unary +/- and +, -, *, /. Reject all other syntax. Use AST parsing and whitelisted evaluation, never eval or exec. Limits: 512 expression characters, 128 AST nodes, depth 16 (root depth 1), and finite inputs/intermediate results/results with absolute value <= 1e15. Check length before parsing. Conversion applies input scale first, then compatible unit conversion: 1 km=1000 m; 1 km2=1000000 m2; 1 ML=1000 m3; 1 m3=1000 L. Reverse conversions are supported. one is dimensionless; one, KZT, person, pupil and school each convert only to the same label. No compound units, currency exchange or calendar conversion. Normalise quantities separately before calculating ratios. Return finite floating-point results without extra intermediate rounding; evaluate does not check units or the meaning of a formula.",
+        "strict": false,
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "type": "string",
+              "enum": [
+                "evaluate",
+                "convert"
+              ]
+            },
+            "expression": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512,
+              "description": "Required only for evaluate. Non-blank expression; use decimal points and no thousands separators."
+            },
+            "value": {
+              "type": "number",
+              "minimum": -1000000000000000.0,
+              "maximum": 1000000000000000.0,
+              "description": "Required only for convert. Numeric quantity before scaling; booleans are invalid."
+            },
+            "scale": {
+              "type": "string",
+              "enum": [
+                "one",
+                "thousand",
+                "million"
+              ],
+              "default": "one",
+              "description": "Optional only for convert. Input multiplier: 1, 1000 or 1000000. The tool defaults to one; output uses ordinary target units."
+            },
+            "from_unit": {
+              "type": "string",
+              "enum": [
+                "one",
+                "KZT",
+                "person",
+                "pupil",
+                "school",
+                "m",
+                "km",
+                "m2",
+                "km2",
+                "L",
+                "m3",
+                "ML"
+              ],
+              "description": "Required only for convert. Case-sensitive source unit."
+            },
+            "to_unit": {
+              "type": "string",
+              "enum": [
+                "one",
+                "KZT",
+                "person",
+                "pupil",
+                "school",
+                "m",
+                "km",
+                "m2",
+                "km2",
+                "L",
+                "m3",
+                "ML"
+              ],
+              "description": "Required only for convert. Compatible, case-sensitive target unit."
+            }
+          },
+          "required": [
+            "mode"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  ],
+  "limitations": "Schema text estimate only; API internal formatting and message framing are not measured."
+}

@@ -1,0 +1,96 @@
+{
+  "kind": "offline_manual_tool_replay",
+  "model_invocations": 0,
+  "created_utc": "2026-10-19T22:41:11.828360+00:00",
+  "design_sha256": "8055e85b84febf580a50a965987228690aecb5df1507e369f970a2dd914b4ec8",
+  "calls": [
+    {
+      "call": {
+        "id": "call_lookup_brightwater",
+        "type": "function",
+        "function": {
+          "name": "lookup",
+          "arguments": "{\"query\":\"Brightwater population 2025 area\",\"top_k\":1}"
+        }
+      },
+      "result": {
+        "ok": true,
+        "matches": [
+          {
+            "doc_id": "NR-05",
+            "title": "Brightwater district profile (2025)",
+            "chunk_id": "NR-05:s2-3",
+            "text": "The district, founded in 1889, stretches along the Bright over 912.4 square kilometres and keeps 455.0 km of paved road. Census population: 39,902 in 2020 and 44,675 in 2025.",
+            "kind": "profile",
+            "correction_of": null
+          }
+        ],
+        "corrections": [
+          {
+            "doc_id": "NR-16",
+            "title": "Correction notice - Brightwater",
+            "chunk_id": "NR-16:s1-2",
+            "text": "Correction: the 2025 Brightwater district profile gives the district's area as 912.4 square kilometres. This is a transposition error.",
+            "kind": "correction",
+            "correction_of": "NR-05"
+          },
+          {
+            "doc_id": "NR-16",
+            "title": "Correction notice - Brightwater",
+            "chunk_id": "NR-16:s3-4",
+            "text": "The correct area is 921.4 square kilometres. All other figures in that profile are correct.",
+            "kind": "correction",
+            "correction_of": "NR-05"
+          }
+        ],
+        "has_more": true
+      },
+      "elapsed_seconds": 0.00023320000036619604
+    },
+    {
+      "call": {
+        "id": "call_lookup_millbrook",
+        "type": "function",
+        "function": {
+          "name": "lookup",
+          "arguments": "{\"query\":\"Millbrook population 2025 area\",\"top_k\":1}"
+        }
+      },
+      "result": {
+        "ok": true,
+        "matches": [
+          {
+            "doc_id": "NR-11",
+            "title": "Millbrook district profile (2025)",
+            "chunk_id": "NR-11:s2-3",
+            "text": "The district, founded in 1897, stretches along the Mill Brook over 758.6 square kilometres and keeps 360.1 km of paved road. Census population: 34,590 in 2020 and 37,203 in 2025.",
+            "kind": "profile",
+            "correction_of": null
+          }
+        ],
+        "corrections": [],
+        "has_more": true
+      },
+      "elapsed_seconds": 0.00013469999976223335
+    },
+    {
+      "call": {
+        "id": "call_calculate_difference",
+        "type": "function",
+        "function": {
+          "name": "calculate",
+          "arguments": "{\"mode\":\"evaluate\",\"expression\":\"37203 / 758.6 - 44675 / 921.4\"}"
+        }
+      },
+      "result": {
+        "ok": true,
+        "mode": "evaluate",
+        "value": 0.5556561156405735,
+        "unit": null
+      },
+      "elapsed_seconds": 0.00011310000263620168
+    }
+  ],
+  "manual_final_answer_not_generated": "ANSWER: Millbrook | 0.6",
+  "limitation": "Actual Python tool outputs for manually prescribed calls; not an S3 model conversation or benchmark."
+}

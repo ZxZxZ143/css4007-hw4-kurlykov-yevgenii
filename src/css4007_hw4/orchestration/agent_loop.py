@@ -46,6 +46,9 @@ def run_loop(client: Client, initial_messages: list[dict], config: Config,
         requests.append(record)
         if sink:
             sink({"type": "request", "data": record})
+        if response.model and response.model != config.model and not response.model.startswith(config.model + "-"):
+            reason = "model_mismatch"
+            break
         message = response.message
         if not isinstance(message, dict) or message.get("role") != "assistant":
             reason = "protocol_error"

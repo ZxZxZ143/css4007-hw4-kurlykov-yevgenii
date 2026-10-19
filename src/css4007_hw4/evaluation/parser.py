@@ -28,7 +28,7 @@ def parse_answer(text: str | None) -> Answer | None:
         return None
     try:
         value = Decimal(match[2])
-        if not value.is_finite() or abs(value) > Decimal("1e15") or value.as_tuple().exponent < -100:
+        if not value.is_finite() or value.copy_abs() > Decimal("1e15") or value.as_tuple().exponent < -100:
             return None
         return Answer(match[1].strip(), value)
     except InvalidOperation:
