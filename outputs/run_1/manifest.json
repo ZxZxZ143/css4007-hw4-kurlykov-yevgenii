@@ -1,0 +1,180 @@
+{
+  "schema_version": 1,
+  "kind": "live",
+  "created_utc": "2026-10-19T22:45:09.611631+00:00",
+  "status": "completed",
+  "config": {
+    "model": "gpt-5.6-luna",
+    "temperature": 0.7,
+    "reasoning_effort": "none",
+    "max_completion_tokens": 4096,
+    "max_rounds": 8,
+    "samples": 5,
+    "timeout_seconds": 90
+  },
+  "strategies": [
+    "S1",
+    "S2",
+    "S3"
+  ],
+  "question_ids": [
+    "Q-01",
+    "Q-02",
+    "Q-03",
+    "Q-04",
+    "Q-05",
+    "Q-06",
+    "Q-07",
+    "Q-08",
+    "Q-09",
+    "Q-10",
+    "Q-11",
+    "Q-12",
+    "Q-13",
+    "Q-14",
+    "Q-15",
+    "Q-16",
+    "Q-17",
+    "Q-18",
+    "Q-19",
+    "Q-20"
+  ],
+  "vague_lookup": false,
+  "pricing": {
+    "input_per_million": "0.20",
+    "cached_input_per_million": "0.02",
+    "output_per_million": "1.20",
+    "source": "https://developers.openai.com/api/docs/models/gpt-5.6-luna",
+    "verified_date": "2026-10-20",
+    "model": "gpt-5.6-luna",
+    "currency": "USD",
+    "service_tier": "default",
+    "max_prompt_tokens": 272000
+  },
+  "git_commit": "b714ef15bdc74a6f38582a721ca5cd26bc6a0886",
+  "tracked_worktree_changes": "M .env.example\n M README.md",
+  "protocol_commit": "e75c41ddab696ad5fa75f7c0c13f2e646983f1e5",
+  "protocol_sha256": "e7d4984307e168a49111c05015d29a7c0b870ba93d0fae87b74d0c670ab732f4",
+  "corpus_sha256": "b161ba17a7d9245149e13256232d7495db47e5777ebfc93e8d62e993272aa65d",
+  "questions_sha256": "9255e6a72fb695e3de26c604ef09ad646d450e0b894ba96f195cb6d6c77b5479",
+  "source_sha256": "19e0beea7b8620b4ffd9ca3f89dc79ebf3702932893c06cb6eec9da53a5d5bd9",
+  "prompts_sha256": "807f8a0f30391452210495f49a4eafe8e388695533334a23a79dc7b58bcb516b",
+  "tool_definitions": [
+    {
+      "type": "function",
+      "function": {
+        "name": "lookup",
+        "description": "Search data/corpus.jsonl using BM25 over short original excerpts, without using reference answers. Query by district, indicator and period; regional and multi-district queries are allowed. Exclude archived profiles but retain historical figures in current sources. Return excerpts preserving values, periods and units, with doc_id, title, chunk_id, text, kind (profile/reference/correction) and correction_of (document ID or null). Include and deduplicate related correction excerpts; corrections override only the facts they explicitly change. Limits: top_k primary matches, 10 excerpts overall, 2 complete sentences and 500 text characters per excerpt, and 3000 text characters overall. Return an error if necessary correction context cannot fit. Return selected passages, not whole documents. The model interprets the evidence and requests more if needed; the tool does not calculate or answer the question.",
+        "strict": false,
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 300,
+              "pattern": "\\S",
+              "description": "Non-blank search text. Prefer English corpus terminology, e.g. Brightwater population 2025 area."
+            },
+            "top_k": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 5,
+              "default": 3,
+              "description": "Maximum primary matches. The tool defaults to 3. Additional corrections share the overall limits but do not count toward top_k."
+            }
+          },
+          "required": [
+            "query"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "calculate",
+        "description": "Evaluate arithmetic or convert one numeric quantity. evaluate requires only mode and expression; convert requires mode, value, from_unit and to_unit, with optional scale. Reject fields belonging to the other mode. Arithmetic permits real numeric literals (including scientific notation), parentheses, unary +/- and +, -, *, /. Reject all other syntax. Use AST parsing and whitelisted evaluation, never eval or exec. Limits: 512 expression characters, 128 AST nodes, depth 16 (root depth 1), and finite inputs/intermediate results/results with absolute value <= 1e15. Check length before parsing. Conversion applies input scale first, then compatible unit conversion: 1 km=1000 m; 1 km2=1000000 m2; 1 ML=1000 m3; 1 m3=1000 L. Reverse conversions are supported. one is dimensionless; one, KZT, person, pupil and school each convert only to the same label. No compound units, currency exchange or calendar conversion. Normalise quantities separately before calculating ratios. Return finite floating-point results without extra intermediate rounding; evaluate does not check units or the meaning of a formula.",
+        "strict": false,
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "type": "string",
+              "enum": [
+                "evaluate",
+                "convert"
+              ]
+            },
+            "expression": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512,
+              "description": "Required only for evaluate. Non-blank expression; use decimal points and no thousands separators."
+            },
+            "value": {
+              "type": "number",
+              "minimum": -1000000000000000.0,
+              "maximum": 1000000000000000.0,
+              "description": "Required only for convert. Numeric quantity before scaling; booleans are invalid."
+            },
+            "scale": {
+              "type": "string",
+              "enum": [
+                "one",
+                "thousand",
+                "million"
+              ],
+              "default": "one",
+              "description": "Optional only for convert. Input multiplier: 1, 1000 or 1000000. The tool defaults to one; output uses ordinary target units."
+            },
+            "from_unit": {
+              "type": "string",
+              "enum": [
+                "one",
+                "KZT",
+                "person",
+                "pupil",
+                "school",
+                "m",
+                "km",
+                "m2",
+                "km2",
+                "L",
+                "m3",
+                "ML"
+              ],
+              "description": "Required only for convert. Case-sensitive source unit."
+            },
+            "to_unit": {
+              "type": "string",
+              "enum": [
+                "one",
+                "KZT",
+                "person",
+                "pupil",
+                "school",
+                "m",
+                "km",
+                "m2",
+                "km2",
+                "L",
+                "m3",
+                "ML"
+              ],
+              "description": "Required only for convert. Compatible, case-sensitive target unit."
+            }
+          },
+          "required": [
+            "mode"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  ],
+  "max_retries": 0,
+  "completed_utc": "2026-10-19T22:50:52.113212+00:00",
+  "runner_wall_seconds": 342.61508600000525
+}

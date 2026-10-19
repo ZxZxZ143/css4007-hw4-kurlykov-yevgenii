@@ -1,0 +1,14 @@
+{
+  "kind": "post_inference_trace_check",
+  "description": "Re-evaluation of the arithmetic written in the selected S2 Q-05 sample, not a model request or benchmark answer",
+  "arguments": {
+    "mode": "evaluate",
+    "expression": "2366900000/11407-2884600000/14926"
+  },
+  "result": {
+    "ok": true,
+    "mode": "evaluate",
+    "value": 14235.314486389194,
+    "unit": null
+  }
+}
