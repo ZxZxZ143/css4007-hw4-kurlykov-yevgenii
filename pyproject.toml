@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "css4007-hw4"
+version = "0.1.0"
+description = "Reproducible comparison of direct, self-consistency and tool-based LLM strategies"
+requires-python = ">=3.11"
+dependencies = ["openai>=1.40", "python-dotenv>=1.0", "tiktoken>=0.7"]
+
+[project.optional-dependencies]
+test = ["pytest>=8.0"]
+
+[project.scripts]
+hw4 = "css4007_hw4.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+css4007_hw4 = ["tools/*.json"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = "-ra"

@@ -4,3 +4,10 @@ __pycache__/
 *.pyc
 .pytest_cache/
 .ipynb_checkpoints/
+.idea/
+*.egg-info/
+build/
+dist/
+.ruff_cache/
+.env.*
+!.env.example
