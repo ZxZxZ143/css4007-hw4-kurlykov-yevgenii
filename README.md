@@ -66,7 +66,7 @@ outputs/        your saved results and logs
 python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-cp .env.example .env             # then put your OpenAI key in .env
+cp .env .env             # then put your OpenAI key in .env
 ```
 
 You need one OpenAI API key (`OPENAI_API_KEY`). Use the model **`gpt-5.6-luna`**

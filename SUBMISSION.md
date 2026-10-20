@@ -264,61 +264,140 @@ The difference is positive, so **Millbrook** has the higher density. Rounded to 
 
 ### What I changed from Part A while coding
 
-<!-- what changed in your plan, and why. "None" is an answer too. -->
-
+>The original architecture was preserved: the model selects the required information and formulas, lookup retrieves evidence, calculate performs numerical operations, and the loop manages tool execution and conversation history.
+>
+>Four implementation refinements were introduced:
+>
+>Rounding: The model returns a sufficiently precise number, while the evaluator applies the question-specific decimals after inference. This prevents reference-answer information from leaking into model prompts.
+>
+>Correction handling: The lookup tool returns all necessary correction excerpts. For Q-09, both parts of NR-16 are included instead of the single excerpt shown in the manual scenario.
+>
+>Context preservation: Source sentences are not silently truncated when necessary information would be lost. The tool returns CONTEXT_LIMIT_EXCEEDED if required evidence cannot fit within the limits.
+>
+>Additional safety checks: Tool arguments are limited to 8,192 JSON characters and 32 tool executions per model response. Missing or duplicate tool-call IDs are treated as protocol errors.
+>
+>These adjustments improve reliability and safety without changing the original separation of responsibilities.
 ### B2 — Tests
 
 ```text
-<!-- pytest output -->
+(.venv) PS C:\Users\kyrlu\PycharmProjects\css4007-hw4-kurlykov-yevgenii> python -m pytest -q
+..................................................................................................................................................                           [100%]
+146 passed in 5.74s
 ```
 
 ### B3 — The loop
 
-- Round limit, and why:
-- Where the logs are:
-- Real Q-09 conversation compared with my A3 version, what is different:
+- Round limit, and why: The limit is 8 model calls per question, including the final response. A typical question requires three rounds: retrieval, calculation, and final answer. Additional rounds allow the model to refine searches, perform conversions, or recover from tool errors. If the limit is reached without a valid answer, the question is marked unanswered.
+- Where the logs are: Individual question traces are stored in outputs/run_1/traces/<strategy>/<question_id>.json and outputs/run_2/traces/<strategy>/<question_id>.json, with corresponding .events.jsonl journals. The separate real Q-09 execution is stored in outputs/q09/traces/S3/Q-09.json. Logs include model requests, token usage, tool calls, arguments, results, execution times, and completion status.
+- Real Q-09 conversation compared with my A3 version, what is different: The manual scenario predicted 3 model responses, 2 lookup calls, and 1 calculation. The real execution used 4 model responses, 2 lookup calls, and 3 calculations.
+
+In the first round, the model requested Brightwater and Millbrook data through two lookup calls. It omitted top_k, so the default value of 3 was applied. The search returned NR-05, NR-11, and both correction excerpts from NR-16.
+
+Instead of calculating the difference directly, the model first calculated both densities separately:
+
+44675 / 921.4 = 48.48599956587801
+37203 / 758.6 = 49.041655681518584
+
+Then it calculated the difference:
+
+49.041655681518584 - 48.48599956587801
+= 0.5556561156405735
+
+The final response was:
+
+ANSWER: Millbrook | 0.5556561156405735
+
+The evaluator rounded the result to 0.6, matching the manual answer. The corrected area of 921.4 km² was explicitly used in the calculation.
 
 ### B4 — Three strategies
 
 **What I kept the same:**
 
-<!-- model, temperature, k, prompts, answer format, anything else -->
+>Both full runs used the same 17 documents, 20 questions, model, source assumptions, answer format, and evaluation protocol.
+>
+>Common settings:
+>
+> - Model: gpt-5.6-luna
+>
+>- API: OpenAI Chat Completions
+>
+> - Temperature: 0.7
+>
+> - Reasoning effort: none
+>
+> - Maximum completion tokens: 4096
+>
+> - Timeout: 90 seconds
+>
+> - SDK retries: 0
+>
+> - Answer format: ANSWER: <name or yes/no> | <number>
+>
+>All questions were processed sequentially from Q-01 to Q-20, with strategies executed in the order S1, S2, S3.
+>
+>Only the strategy-specific behavior differed:
+>
+>S1: One direct model call with the complete corpus and question.
+>
+>S2: Five independent model calls (k = 5) with the complete corpus and step-by-step instructions. The most frequent complete answer was selected, with ties resolved by the earliest valid sample.
+>
+>S3: Tool-based reasoning using lookup and calculate, without including the corpus in the initial prompt. The maximum was 8 model calls per question.
 
 **My rule for a correct answer** (written before the first full run):
 
-| Run | Strategy | Correct /20 | Unanswered | Input tokens | Output tokens | Median seconds per question | Total seconds | Cost ($) |
-|---|---|---:|---:|---:|---:|---:|---:|---:|
-| 1 | S1 direct | | | | | | | |
-| 1 | S2 think and vote (k = ) | | | | | | | |
-| 1 | S3 tools | | | | | | | |
-| 2 | S1 direct | | | | | | | |
-| 2 | S2 think and vote (k = ) | | | | | | | |
-| 2 | S3 tools | | | | | | | |
+> The evaluation protocol was fixed in docs/evaluation_protocol.md before the full experiments.
+>
+> A valid response must end with exactly one line in the format:
+>
+>ANSWER: <name or yes/no> | <number>
+>
+>The name must match the reference exactly after removing surrounding whitespace. Both predicted and reference numbers are rounded using Decimal ROUND_HALF_UP to the number of decimal places specified in the reference question.
+>
+>A numerical difference of at most one unit in the last decimal place is accepted. Both the name and numerical value must match for the answer to be correct.
+>
+>A valid but incorrect answer is marked wrong. Missing, malformed, truncated, or unsuccessful answers are marked unanswered.
+>
+>Reference answers and their decimals are used only after inference and are never included in model prompts.
+
+| Run | Strategy                  | Correct /20 | Unanswered | Input tokens | Output tokens | Median seconds per question | Total seconds | Cost ($)   |
+| --- | ------------------------- | ----------- | ---------- | ------------ | ------------- | --------------------------- | ------------- | ---------- |
+| 1   | S1 direct                 | 4/20        | 1          | 46320        | 315           | 1.350                       | 28.164        | 0.00143364 |
+| 1   | S2 think and vote (k = 5) | 16/20       | 0          | 232700       | 14035         | 10.012                      | 202.769       | 0.02166844 |
+| 1   | S3 tools                  | 19/20       | 0          | 163063       | 4239          | 4.731                       | 111.277       | 0.01296092 |
+| 2   | S1 direct                 | 2/20        | 4          | 46320        | 312           | 1.350                       | 28.101        | 0.00131160 |
+| 2   | S2 think and vote (k = 5) | 15/20       | 0          | 232700       | 14364         | 10.311                      | 209.366       | 0.02194480 |
+| 2   | S3 tools                  | 18/20       | 0          | 166123       | 4156          | 4.801                       | 111.220       | 0.01101110 |
+
+Token counts include the usage of every API request: all five samples in S2 and all model rounds in S3.
+
+Median latency includes all processing required to answer each question. Total seconds represent the sum of per-question execution times, rather than overall runner wall-clock time.
+
+Costs were calculated using the recorded token usage and model pricing, accounting for cached input tokens where applicable.
 
 **Per question (run 1):**
 
 | Question | S1 | S2 | S3 |
-|---|:---:|:---:|:---:|
-| Q-01 | | | |
-| Q-02 | | | |
-| Q-03 | | | |
-| Q-04 | | | |
-| Q-05 | | | |
-| Q-06 | | | |
-| Q-07 | | | |
-| Q-08 | | | |
-| Q-09 | | | |
-| Q-10 | | | |
-| Q-11 | | | |
-| Q-12 | | | |
-| Q-13 | | | |
-| Q-14 | | | |
-| Q-15 | | | |
-| Q-16 | | | |
-| Q-17 | | | |
-| Q-18 | | | |
-| Q-19 | | | |
-| Q-20 | | | |
+|----------|----|----|----|
+| Q-01     | ✗  | ✓  | ✓  |
+| Q-02     | ✗  | ✓  | ✓  |
+| Q-03     | ✗  | ✓  | ✓  |
+| Q-04     | ✗  | ✓  | ✓  |
+| Q-05     | ✗  | ✗  | ✓  |
+| Q-06     | ✓  | ✓  | ✓  |
+| Q-07     | ✗  | ✓  | ✓  |
+| Q-08     | ✗  | ✓  | ✓  |
+| Q-09     | ✗  | ✓  | ✓  |
+| Q-10     | ✓  | ✓  | ✓  |
+| Q-11     | ✗  | ✓  | ✗  |
+| Q-12     | ✗  | ✗  | ✓  |
+| Q-13     | ✓  | ✓  | ✓  |
+| Q-14     | ✗  | ✓  | ✓  |
+| Q-15     | ✗  | ✓  | ✓  |
+| Q-16     | ✓  | ✓  | ✓  |
+| Q-17     | ✗  | ✓  | ✓  |
+| Q-18     | ✗  | ✗  | ✓  |
+| Q-19     | ✗  | ✓  | ✓  |
+| Q-20     | ✗  | ✗  | ✓  |
 
 ---
 
@@ -326,23 +405,155 @@ The difference is positive, so **Millbrook** has the higher density. Rounded to 
 
 ### C1 — Does the tool description matter?
 
+>I selected Q-01, Q-03, Q-08, Q-09, and Q-18 and reran S3 with the lookup description replaced by "Looks things up.". The tool implementation, parameters, model, temperature, and other settings remained unchanged. The original S3 results from Run 1 were used as the baseline.
+
 | Question | Calls (your description) | Calls (vague) | Answer (yours) | Answer (vague) |
 |---|---:|---:|---|---|
 | | | | | |
 
+> Accuracy decreased from 5/5 to 4/5, while total tool calls increased from 24 to 25. The vague-description version made additional searches in Q-03, Q-08, and Q-18.
+>
+>The most interesting difference was Q-09. The original version correctly identified Millbrook, while the vague version used the opposite subtraction order and incorrectly selected Brightwater, despite retrieving the corrected area.
+>
+>This suggests that tool descriptions may influence how efficiently and correctly the model uses tools. However, because temperature was 0.7 and no fixed seed was used, the observed differences may also reflect sampling variability. Therefore, one five-question experiment cannot establish a causal effect.
+
 ### C2 — Three mistakes explained
 
+1. S1 — Q-01: Incorrect district and density difference
+
+    Trace: outputs/run_1/traces/S1/Q-01.json
+
+    The direct strategy returned:
+
+    ANSWER: Ossford | 0.7911737459
+
+    The correct answer was Ossbridge | 4.6.
+
+    Both the district and numerical value were incorrect. Since S1 used a single model call without tool traces or intermediate calculations, the saved output does not show exactly where the error occurred.
+
+    This illustrates a limitation of direct answering: even with all documents available, the model may produce incorrect results without an independently verifiable calculation. The precise cause cannot be established from this trace alone.
+
+2. S2 — Q-05: Incorrect arithmetic despite repeated reasoning
+
+    Trace: outputs/run_1/traces/S2/Q-05.json
+
+    The selected answer was:
+
+    ANSWER: Coldharbour | 14221.1082172118
+
+    The model selected the correct district and identified the relevant budget and population values, but calculated the difference incorrectly.
+
+    The correct calculation is:
+
+    2366900000 / 11407 - 2884600000 / 14926
+= 14235.314486389194
+
+    The five samples produced different numerical results. Four were parseable, but none had the same complete voting key. The fifth contained an invalid numeric suffix. Therefore, the predefined tie-breaking rule selected the earliest valid answer.
+
+    Self-consistency can reduce random errors when independently generated solutions agree on the correct answer. However, voting cannot guarantee correctness when every calculation differs or several samples share the same mistake. It also increases token usage because the complete prompt is processed five times.
+
+3. S3 — Q-11: Correct calculation of the wrong expression
+
+    Trace: outputs/run_1/traces/S3/Q-11.json
+
+    The model retrieved the relevant information from NR-09, NR-10, and NR-11, then called calculate with:
+
+    {
+  "mode": "evaluate",
+  "expression": "8837/24-3147/10"
+}
+
+    The calculator correctly returned:
+
+    53.508333333333326
+
+    However, the question required the difference between the highest and lowest pupils-per-school ratios among three districts.
+
+    The highest ratio belonged to Millbrook:
+
+    5562 / 15 = 370.8
+
+    The lowest belonged to Redfen:
+
+    3147 / 10 = 314.7
+
+    Therefore, the correct difference was:
+
+    370.8 - 314.7 = 56.1
+
+    The model correctly identified Redfen as the lowest but mistakenly used Ashgrove instead of Millbrook for the highest value.
+
+    This demonstrates that tools improve arithmetic reliability but do not eliminate reasoning errors. The calculator guarantees the result of the supplied expression, not that the model selected the correct expression.
+
 ### C3 — Which strategy I would use, and what would change it
+>For this problem, I would choose S3 — Tools, because it provided the best balance of accuracy, cost, and execution time.
+>
+>In Run 1, S3 answered 19/20 questions correctly, compared with 16/20 for S2 and 4/20 for S1. Run 2 showed a similar ranking: S3 achieved 18/20, S2 achieved 15/20, and S1 achieved 2/20.
+>
+>S3 was also approximately 40% cheaper than S2 in Run 1 and 50% cheaper in Run 2, with roughly half the median execution time.
+>
+>The main advantage is the separation of responsibilities. The model retrieves evidence through lookup and delegates arithmetic to calculate, reducing numerical errors and making the process easier to inspect.
+>
+>I would not choose S1 because its low accuracy makes it unsuitable for these multi-step numerical questions, despite its lower cost and latency. I would not choose S2 because generating five answers increases costs and execution time, while voting does not reliably correct arithmetic mistakes.
+>
+>My choice could change under different conditions:
+>
+> - Strict latency requirements or a very small budget: S1 may be preferable for simple questions when lower accuracy is acceptable and only one model request is allowed.
+>
+> - Questions without arithmetic: Direct answering may provide sufficient accuracy without tool overhead.
+>
+> - A much larger document collection: I would prefer S3 with a scalable retrieval index, because repeatedly sending all documents to S1 or S2 would become expensive and potentially exceed context limits.
+>
+>These choices depend on the task requirements and should be validated with new experiments.
 
 ### C4 — How sure I can be
 
+>The two runs produced slightly different results:
+>
+>S1: 4/20 → 2/20
+>
+>S2: 16/20 → 15/20
+>
+>S3: 19/20 → 18/20
+>
+>S3 outperformed S2 by 3 questions (15 percentage points) in both runs. This difference was larger than the one-question variation observed within either S2 or S3 between runs.
+>
+>However, the benchmark contains only 20 questions from one fictional dataset. A single question changes accuracy by five percentage points, and two runs are insufficient to establish a statistically reliable ranking.
+>
+>I would start with at least 200 independently constructed questions covering different reasoning types and conduct several repeated runs. I would then estimate paired accuracy differences and confidence intervals and determine whether more questions are necessary.
+>
+>The 200-question target is a practical starting point, not a statistically proven minimum. The current results support S3 for this benchmark, but not a universal claim that tool-based reasoning is always better.
+
 ### Final questions
 
-1.
-2.
-3.
-4.
-5.
-6.
-7.
-8.
+1. When the model sends a tool_calls message, what has actually run so far?
+
+    Only the model's API request has completed, producing a description of the requested tool calls. No Python tool function has executed yet. The loop must validate the arguments, execute the corresponding tools, and return their results to the model.
+
+2. Why does arguments arrive as a string, and what goes wrong if you pass it straight into your function?
+
+    Function-call arguments are transmitted as a JSON string according to the API protocol. The loop must parse the string into a dictionary and validate its types, required fields, and structure before execution. Passing it directly to the tool would violate the expected function interface and bypass validation.
+
+3. How many tokens do your two tool definitions add to every S3 request? Measure it.
+
+    Using tiktoken with the o200k_base encoding, the serialized tool definitions contain 834 tokens: 303 for lookup and 531 for calculate. The measurement is saved in outputs/offline/tool_overhead.json. This is a tokenizer-based estimate of the schema text, not an exact API-measured difference, because server-side tool formatting may add overhead.
+
+4. How much more did S2 cost than S1? Give the number from your table and explain it.
+
+    In Run 1, S2 cost $0.02166844 versus $0.00143364 for S1, making it approximately 15.11 times more expensive. In Run 2, S2 was approximately 16.73 times more expensive. S2 makes five requests per question and generates longer reasoning responses, while prompt caching also affects the final cost.
+
+5. Which question needed the most rounds in S3, and why?
+
+    Q-14 required the most rounds, with 7 model calls in both runs. In Run 1, the model made six lookup calls to collect household water consumption and population data for Tarnvale and Ashgrove, followed by three calculator calls. Input tokens increased from 1,186 in the first round to 3,869 in the seventh because previous messages and tool results accumulated in the conversation.
+
+6. What would you change in lookup if there were 100,000 documents?
+
+    I would replace the current small-corpus search approach with a persistent inverted BM25 index and efficient metadata filtering. I would also add incremental indexing, document version management, and explicit correction relationships. Retrieval accuracy and performance would need evaluation on a larger independent dataset.
+
+7. What stops your calculate from running dangerous code? Could the model still make it misbehave?
+
+    The calculator uses AST parsing with a strict whitelist of arithmetic operations, rejecting function calls, imports, variables, attribute access, and exponentiation. It also limits expression length, AST complexity, and numerical values. However, the model can still provide incorrect formulas or units, producing mathematically valid but semantically incorrect answers, as demonstrated by Q-11.
+
+8. For which kind of question did tools help most, and for which did they not help at all?
+
+    The largest observed improvement over S2 was in budget-related calculations (Q-05, Q-12, Q-20), where S3 answered 3/3 correctly, compared with 0/3 for S2 in Run 1. For water-related questions Q-03, Q-08, Q-14, and Q-17, both S2 and S3 achieved 4/4, so tools provided no additional accuracy in that comparison. Questions Q-06, Q-10, Q-13, and Q-16 were answered correctly by all three strategies, showing no accuracy advantage from tools in those cases.
